@@ -1,0 +1,12 @@
+#Data Files
+*.csv
+
+#OS Junk Files
+[Tt]humbs.db
+*.DS_Store
+
+#PyCharm files
+.idea/*
+
+# Office Temp Files
+~$*
