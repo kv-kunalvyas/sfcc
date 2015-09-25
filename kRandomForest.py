@@ -1,9 +1,11 @@
 __author__ = 'kunal'
 import numpy as np
 import pandas as pd
-import csv as csv
+import csv
+import string
 from sklearn.ensemble import RandomForestClassifier as rfc
 
+####################### Train Data #######################
 trainDf = pd.read_csv('train.csv', header=0)#, parse_dates=['Dates'])
 
 #trainDf['Year'] = trainDf['Dates'].map(lambda x: x.year)
@@ -19,11 +21,23 @@ trainDf = pd.read_csv('train.csv', header=0)#, parse_dates=['Dates'])
 # X
 # Y
 
+def dequote(s):
+    """
+    If a string has single or double quotes around it, remove them.
+    Make sure the pair of quotes match.
+    If a matching pair of quotes is not found, return the string unchanged.
+    """
+    if (s[0] == s[-1]) and s.startswith(('"')):
+        return s[1:-1]
+    return s
+
 # TODO: Change string categories to integer classifiers
 # determine all values
 Categories = list(enumerate(sorted(np.unique(trainDf['Category']))))
 Descriptions = list(enumerate(sorted(np.unique(trainDf['Descript']))))
 DaysOfWeeks = list(enumerate(sorted(np.unique(trainDf['DayOfWeek']))))
+PdDistricts = list(enumerate(sorted(np.unique(trainDf['PdDistrict']))))
+Resolutions = list(enumerate(sorted(np.unique(trainDf['Resolution']))))
 # set up dictionaries
 CategoriesDict = {name: i for i, name in Categories}
 DescriptionsDict = {name: i for i, name in Descriptions}
@@ -38,6 +52,7 @@ trainDf.PdDistrict = trainDf.PdDistrict.map(lambda x: PdDistrictsDict[x]).astype
 trainDf.Resolution = trainDf.Resolution.map(lambda x: ResolutionsDict[x]).astype(int)
 
 # TODO: Fill missing values if any
+# Compute mean of a column and fill missing values
 # def computeMean(column):
 #     columnName = str(column)
 #     meanValue = trainDf[columnName].dropna().mean()
@@ -46,8 +61,12 @@ trainDf.Resolution = trainDf.Resolution.map(lambda x: ResolutionsDict[x]).astype
 #
 # computeMean(Category)
 
+# select the following columns only
+#trainDf = [col for col in trainDf.columns if col in ['Descript', 'DayOfWeek', 'PdDistrict', 'Address']]
+# select all columns except
 trainDf = trainDf.drop(['Dates', 'Descript', 'Resolution', 'Address', 'X', 'Y'], axis=1)
 
+####################### Test data #######################
 testDf = pd.read_csv('test.csv', header=0)
 ids = testDf['Id'].values
 testDf = testDf.drop(['Id', 'Dates', 'Address', 'X', 'Y'], axis=1)
@@ -59,20 +78,24 @@ DaysOfWeeksDict = {name: i for i, name in DaysOfWeeks}
 testDf.PdDistrict = testDf.PdDistrict.map(lambda x: PdDistrictsDict[x]).astype(int)
 testDf.DayOfWeek = testDf.DayOfWeek.map(lambda x: DaysOfWeeksDict[x]).astype(int)
 
-# TODO: Random Forest Algorithm
+# Random Forest Algorithm
 print list(trainDf.columns.values)
 print list(testDf.columns.values)
+
 # back to numpy format
 trainData = trainDf.values
 testData = testDf.values
 
 print 'Training...'
-forest = rfc(n_estimators=1)
+forest = rfc(n_estimators=15)
+forest = forest.fit(trainData[0::, 1::], trainData[0::, 0])
 
 print 'Predicting...'
 output = forest.predict(testData).astype(int)
-for i in range(0, output.size, 1):
-    for j in range(0, output[i][0], 1):
+print 'Output Size =', output.size
+newOutput = []
+for i in range(output.size):
+    newOutput.append('0,' * (output[i]-1) + str(1) + ',0' * (39 - output[i]))
 
 predictions_file = open("submission.csv", "wb")
 open_file_object = csv.writer(predictions_file)
@@ -84,6 +107,7 @@ open_file_object.writerow(["Id",'ARSON','ASSAULT','BAD CHECKS','BRIBERY','BURGLA
                            'SECONDARY CODES','SEX OFFENSES FORCIBLE','SEX OFFENSES NON FORCIBLE','STOLEN PROPERTY',
                            'SUICIDE','SUSPICIOUS OCC','TREA','TRESPASS','VANDALISM','VEHICLE THEFT','WARRANTS',
                            'WEAPON LAWS'])
-open_file_object.writerows(zip(ids, output))
+open_file_object.writerows(zip(ids, newOutput))
 predictions_file.close()
 print 'Done.'
+
