@@ -10,3 +10,5 @@
 
 # Office Temp Files
 ~$*
+
+*.swp

@@ -2,11 +2,10 @@ __author__ = 'kunal'
 import numpy as np
 import pandas as pd
 import csv
-import string
 from sklearn.ensemble import RandomForestClassifier as rfc
 
-####################### Train Data #######################
-trainDf = pd.read_csv('train.csv', header=0)#, parse_dates=['Dates'])
+# Train Data
+trainDf = pd.read_csv('train.csv', header=0) #, parse_dates=['Dates'])
 
 #trainDf['Year'] = trainDf['Dates'].map(lambda x: x.year)
 #trainDf['Week'] = trainDf['Dates'].map(lambda x: x.week)
@@ -20,16 +19,6 @@ trainDf = pd.read_csv('train.csv', header=0)#, parse_dates=['Dates'])
 # Address
 # X
 # Y
-
-def dequote(s):
-    """
-    If a string has single or double quotes around it, remove them.
-    Make sure the pair of quotes match.
-    If a matching pair of quotes is not found, return the string unchanged.
-    """
-    if (s[0] == s[-1]) and s.startswith(('"')):
-        return s[1:-1]
-    return s
 
 # TODO: Change string categories to integer classifiers
 # determine all values
@@ -63,10 +52,11 @@ trainDf.Resolution = trainDf.Resolution.map(lambda x: ResolutionsDict[x]).astype
 
 # select the following columns only
 #trainDf = [col for col in trainDf.columns if col in ['Descript', 'DayOfWeek', 'PdDistrict', 'Address']]
+# OR :
 # select all columns except
 trainDf = trainDf.drop(['Dates', 'Descript', 'Resolution', 'Address', 'X', 'Y'], axis=1)
 
-####################### Test data #######################
+# Test data
 testDf = pd.read_csv('test.csv', header=0)
 ids = testDf['Id'].values
 testDf = testDf.drop(['Id', 'Dates', 'Address', 'X', 'Y'], axis=1)
@@ -87,15 +77,12 @@ trainData = trainDf.values
 testData = testDf.values
 
 print 'Training...'
-forest = rfc(n_estimators=15)
-forest = forest.fit(trainData[0::, 1::], trainData[0::, 0])
+forest = rfc(n_estimators=25)
+forest = forest.fit(trainData[0::,1::], trainData[0::,0])
 
 print 'Predicting...'
-output = forest.predict(testData).astype(int)
-print 'Output Size =', output.size
-newOutput = []
-for i in range(output.size):
-    newOutput.append('0,' * (output[i]-1) + str(1) + ',0' * (39 - output[i]))
+output = forest.predict_proba(testData).astype(float)
+output = output.tolist()
 
 predictions_file = open("submission.csv", "wb")
 open_file_object = csv.writer(predictions_file)
@@ -107,7 +94,8 @@ open_file_object.writerow(["Id",'ARSON','ASSAULT','BAD CHECKS','BRIBERY','BURGLA
                            'SECONDARY CODES','SEX OFFENSES FORCIBLE','SEX OFFENSES NON FORCIBLE','STOLEN PROPERTY',
                            'SUICIDE','SUSPICIOUS OCC','TREA','TRESPASS','VANDALISM','VEHICLE THEFT','WARRANTS',
                            'WEAPON LAWS'])
-open_file_object.writerows(zip(ids, newOutput))
+for x in range(len(output)):
+    output[x].insert(0, x)
+    open_file_object.writerow(output[x])
 predictions_file.close()
 print 'Done.'
-
