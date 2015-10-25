@@ -5,22 +5,13 @@ import csv
 from sklearn.ensemble import RandomForestClassifier as rfc
 
 # Train Data
-trainDf = pd.read_csv('train.csv', header=0) #, parse_dates=['Dates'])
+trainDf = pd.read_csv('../data/train.csv', header=0) #, parse_dates=['Dates'])
 
 #trainDf['Year'] = trainDf['Dates'].map(lambda x: x.year)
 #trainDf['Week'] = trainDf['Dates'].map(lambda x: x.week)
 #trainDf['Hour'] = trainDf['Dates'].map(lambda x: x.hour)
-# Dates
-# Category -
-# Descript -
-# DayOfWeek .
-# PdDistrict
-# Resolution
-# Address
-# X
-# Y
 
-# TODO: Change string categories to integer classifiers
+# Change string categories to integer classifiers
 # determine all values
 Categories = list(enumerate(sorted(np.unique(trainDf['Category']))))
 Descriptions = list(enumerate(sorted(np.unique(trainDf['Descript']))))
@@ -51,13 +42,13 @@ trainDf.Resolution = trainDf.Resolution.map(lambda x: ResolutionsDict[x]).astype
 # computeMean(Category)
 
 # select the following columns only
-#trainDf = [col for col in trainDf.columns if col in ['Descript', 'DayOfWeek', 'PdDistrict', 'Address']]
+# trainDf = [col for col in trainDf.columns if col in ['Descript', 'DayOfWeek', 'PdDistrict', 'Address']]
 # OR :
 # select all columns except
 trainDf = trainDf.drop(['Dates', 'Descript', 'Resolution', 'Address', 'X', 'Y'], axis=1)
 
 # Test data
-testDf = pd.read_csv('test.csv', header=0)
+testDf = pd.read_csv('../data/test.csv', header=0)
 ids = testDf['Id'].values
 testDf = testDf.drop(['Id', 'Dates', 'Address', 'X', 'Y'], axis=1)
 
