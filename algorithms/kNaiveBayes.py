@@ -2,14 +2,14 @@ __author__ = 'kunal'
 import numpy as np
 import pandas as pd
 import csv
-from sklearn.ensemble import RandomForestClassifier as rfc
+from sklearn.naive_bayes import GaussianNB
 
 # Train Data
-trainDf = pd.read_csv('../data/train.csv', header=0, parse_dates=['Dates'])
+trainDf = pd.read_csv('../data/train.csv', header=0) #, parse_dates=['Dates'])
 
-trainDf['Year'] = trainDf['Dates'].map(lambda x: x.year)
-trainDf['Week'] = trainDf['Dates'].map(lambda x: x.week)
-trainDf['Hour'] = trainDf['Dates'].map(lambda x: x.hour)
+#trainDf['Year'] = trainDf['Dates'].map(lambda x: x.year)
+#trainDf['Week'] = trainDf['Dates'].map(lambda x: x.week)
+#trainDf['Hour'] = trainDf['Dates'].map(lambda x: x.hour)
 
 # Change string categories to integer classifiers
 # determine all values
@@ -45,17 +45,11 @@ trainDf.Resolution = trainDf.Resolution.map(lambda x: ResolutionsDict[x]).astype
 # trainDf = [col for col in trainDf.columns if col in ['Descript', 'DayOfWeek', 'PdDistrict', 'Address']]
 # OR :
 # select all columns except
-# Dates,Category,Descript,DayOfWeek,PdDistrict,Resolution,Address,X,Y,Year,Week,Hour
 trainDf = trainDf.drop(['Dates', 'Descript', 'Resolution', 'Address', 'X', 'Y'], axis=1)
 
 # Test data
-testDf = pd.read_csv('../data/test.csv', header=0, parse_dates=['Dates'])
-testDf['Year'] = testDf['Dates'].map(lambda x: x.year)
-testDf['Week'] = testDf['Dates'].map(lambda x: x.week)
-testDf['Hour'] = testDf['Dates'].map(lambda x: x.hour)
-
+testDf = pd.read_csv('../data/test.csv', header=0)
 ids = testDf['Id'].values
-# Id,Dates,DayOfWeek,PdDistrict,Address,X,Y,Year,Week,Hour
 testDf = testDf.drop(['Id', 'Dates', 'Address', 'X', 'Y'], axis=1)
 
 PdDistricts = list(enumerate(sorted(np.unique(testDf['PdDistrict']))))
@@ -74,14 +68,14 @@ trainData = trainDf.values
 testData = testDf.values
 
 print 'Training...'
-forest = rfc(n_estimators=25)
-forest = forest.fit(trainData[0::,1::], trainData[0::,0])
+bayes = GaussianNB()
+bayes = bayes.fit(trainData[0::,1::], trainData[0::,0])
 
 print 'Predicting...'
-output = forest.predict_proba(testData).astype(float)
+output = bayes.predict_proba(testData).astype(float)
 output = output.tolist()
 
-predictions_file = open("../submissionRF.csv", "wb")
+predictions_file = open("../submissionNB.csv", "wb")
 open_file_object = csv.writer(predictions_file)
 open_file_object.writerow(["Id",'ARSON','ASSAULT','BAD CHECKS','BRIBERY','BURGLARY','DISORDERLY CONDUCT',
                            'DRIVING UNDER THE INFLUENCE','DRUG/NARCOTIC','DRUNKENNESS','EMBEZZLEMENT','EXTORTION',
