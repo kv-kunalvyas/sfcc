@@ -1,65 +1,20 @@
 __author__ = 'kunal'
-import numpy as np
-import pandas as pd
 import csv
 from sklearn.naive_bayes import GaussianNB
+import auxiliary
 
-# Train Data
-trainDf = pd.read_csv('../data/train.csv', header=0) #, parse_dates=['Dates'])
+trainDf = auxiliary.initialise_train(False)
+# auxiliary.computeMean(Category)
 
-#trainDf['Year'] = trainDf['Dates'].map(lambda x: x.year)
-#trainDf['Week'] = trainDf['Dates'].map(lambda x: x.week)
-#trainDf['Hour'] = trainDf['Dates'].map(lambda x: x.hour)
-
-# Change string categories to integer classifiers
-# determine all values
-Categories = list(enumerate(sorted(np.unique(trainDf['Category']))))
-Descriptions = list(enumerate(sorted(np.unique(trainDf['Descript']))))
-DaysOfWeeks = list(enumerate(sorted(np.unique(trainDf['DayOfWeek']))))
-PdDistricts = list(enumerate(sorted(np.unique(trainDf['PdDistrict']))))
-Resolutions = list(enumerate(sorted(np.unique(trainDf['Resolution']))))
-# set up dictionaries
-CategoriesDict = {name: i for i, name in Categories}
-DescriptionsDict = {name: i for i, name in Descriptions}
-DaysOfWeeksDict = {name: i for i, name in DaysOfWeeks}
-PdDistrictsDict = {name: i for i, name in PdDistricts}
-ResolutionsDict = {name: i for i, name in Resolutions}
-# Convert all strings to int
-trainDf.Category = trainDf.Category.map(lambda x: CategoriesDict[x]).astype(int)
-trainDf.Descript = trainDf.Descript.map(lambda x: DescriptionsDict[x]).astype(int)
-trainDf.DayOfWeek = trainDf.DayOfWeek.map(lambda x: DaysOfWeeksDict[x]).astype(int)
-trainDf.PdDistrict = trainDf.PdDistrict.map(lambda x: PdDistrictsDict[x]).astype(int)
-trainDf.Resolution = trainDf.Resolution.map(lambda x: ResolutionsDict[x]).astype(int)
-
-# TODO: Fill missing values if any
-# Compute mean of a column and fill missing values
-# def computeMean(column):
-#     columnName = str(column)
-#     meanValue = trainDf[columnName].dropna().mean()
-#     if len(trainDf.column[ trainDf.column.isnull()]) > 0:
-#         trainDf.loc[(trainDf.column.isnull()), columnName] = meanValue
-#
-# computeMean(Category)
-
-# select the following columns only
-# trainDf = [col for col in trainDf.columns if col in ['Descript', 'DayOfWeek', 'PdDistrict', 'Address']]
-# OR :
 # select all columns except
 trainDf = trainDf.drop(['Dates', 'Descript', 'Resolution', 'Address', 'X', 'Y'], axis=1)
 
 # Test data
-testDf = pd.read_csv('../data/test.csv', header=0)
+testDf = auxiliary.initialise_test(False)
 ids = testDf['Id'].values
 testDf = testDf.drop(['Id', 'Dates', 'Address', 'X', 'Y'], axis=1)
 
-PdDistricts = list(enumerate(sorted(np.unique(testDf['PdDistrict']))))
-DaysOfWeeks = list(enumerate(sorted(np.unique(testDf['DayOfWeek']))))
-PdDistrictsDict = {name: i for i, name in PdDistricts}
-DaysOfWeeksDict = {name: i for i, name in DaysOfWeeks}
-testDf.PdDistrict = testDf.PdDistrict.map(lambda x: PdDistrictsDict[x]).astype(int)
-testDf.DayOfWeek = testDf.DayOfWeek.map(lambda x: DaysOfWeeksDict[x]).astype(int)
-
-# Random Forest Algorithm
+# Attributes used in the model
 print list(trainDf.columns.values)
 print list(testDf.columns.values)
 

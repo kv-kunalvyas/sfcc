@@ -1,73 +1,25 @@
 __author__ = 'kunal'
-import numpy as np
-import pandas as pd
+
 import csv
 from sklearn.ensemble import RandomForestClassifier as rfc
+import auxiliary
 
-# Train Data
-trainDf = pd.read_csv('../data/train.csv', header=0, parse_dates=['Dates'])
-
-trainDf['Year'] = trainDf['Dates'].map(lambda x: x.year)
-trainDf['Week'] = trainDf['Dates'].map(lambda x: x.week)
-trainDf['Hour'] = trainDf['Dates'].map(lambda x: x.hour)
-
-# Change string categories to integer classifiers
-# determine all values
-Categories = list(enumerate(sorted(np.unique(trainDf['Category']))))
-Descriptions = list(enumerate(sorted(np.unique(trainDf['Descript']))))
-DaysOfWeeks = list(enumerate(sorted(np.unique(trainDf['DayOfWeek']))))
-PdDistricts = list(enumerate(sorted(np.unique(trainDf['PdDistrict']))))
-Resolutions = list(enumerate(sorted(np.unique(trainDf['Resolution']))))
-# set up dictionaries
-CategoriesDict = {name: i for i, name in Categories}
-DescriptionsDict = {name: i for i, name in Descriptions}
-DaysOfWeeksDict = {name: i for i, name in DaysOfWeeks}
-PdDistrictsDict = {name: i for i, name in PdDistricts}
-ResolutionsDict = {name: i for i, name in Resolutions}
-# Convert all strings to int
-trainDf.Category = trainDf.Category.map(lambda x: CategoriesDict[x]).astype(int)
-trainDf.Descript = trainDf.Descript.map(lambda x: DescriptionsDict[x]).astype(int)
-trainDf.DayOfWeek = trainDf.DayOfWeek.map(lambda x: DaysOfWeeksDict[x]).astype(int)
-trainDf.PdDistrict = trainDf.PdDistrict.map(lambda x: PdDistrictsDict[x]).astype(int)
-trainDf.Resolution = trainDf.Resolution.map(lambda x: ResolutionsDict[x]).astype(int)
-
-# TODO: Fill missing values if any
-# Compute mean of a column and fill missing values
-# def computeMean(column):
-#     columnName = str(column)
-#     meanValue = trainDf[columnName].dropna().mean()
-#     if len(trainDf.column[ trainDf.column.isnull()]) > 0:
-#         trainDf.loc[(trainDf.column.isnull()), columnName] = meanValue
-#
-# computeMean(Category)
-
-# select the following columns only
-# trainDf = [col for col in trainDf.columns if col in ['Descript', 'DayOfWeek', 'PdDistrict', 'Address']]
-# OR :
+trainDf = auxiliary.initialise_train(False)
+# auxiliary.computeMean(Category)
 # select all columns except
 # Dates,Category,Descript,DayOfWeek,PdDistrict,Resolution,Address,X,Y,Year,Week,Hour
-trainDf = trainDf.drop(['Dates', 'Descript', 'Resolution', 'Address', 'X', 'Y'], axis=1)
+trainDf = trainDf.drop(['Dates', 'Descript', 'Resolution', 'Address'], axis=1)
 
 # Test data
-testDf = pd.read_csv('../data/test.csv', header=0, parse_dates=['Dates'])
-testDf['Year'] = testDf['Dates'].map(lambda x: x.year)
-testDf['Week'] = testDf['Dates'].map(lambda x: x.week)
-testDf['Hour'] = testDf['Dates'].map(lambda x: x.hour)
-
+testDf = auxiliary.initialise_test(False)
 ids = testDf['Id'].values
 # Id,Dates,DayOfWeek,PdDistrict,Address,X,Y,Year,Week,Hour
-testDf = testDf.drop(['Id', 'Dates', 'Address', 'X', 'Y'], axis=1)
-
-PdDistricts = list(enumerate(sorted(np.unique(testDf['PdDistrict']))))
-DaysOfWeeks = list(enumerate(sorted(np.unique(testDf['DayOfWeek']))))
-PdDistrictsDict = {name: i for i, name in PdDistricts}
-DaysOfWeeksDict = {name: i for i, name in DaysOfWeeks}
-testDf.PdDistrict = testDf.PdDistrict.map(lambda x: PdDistrictsDict[x]).astype(int)
-testDf.DayOfWeek = testDf.DayOfWeek.map(lambda x: DaysOfWeeksDict[x]).astype(int)
+testDf = testDf.drop(['Id', 'Dates', 'Address'], axis=1)
 
 # Random Forest Algorithm
 print list(trainDf.columns.values)
 print list(testDf.columns.values)
+#print list(trainDf.X.values)
 
 # back to numpy format
 trainData = trainDf.values
