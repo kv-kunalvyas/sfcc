@@ -1,6 +1,9 @@
 #Data Files
 *.csv
 
+#Python Compiled Files
+*.pyc
+
 #OS Junk Files
 [Tt]humbs.db
 *.DS_Store

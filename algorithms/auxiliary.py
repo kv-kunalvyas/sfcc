@@ -2,7 +2,6 @@ __author__ = 'kunal'
 
 import numpy as np
 import pandas as pd
-import decimal
 
 def initialise_train(dates):
     if not dates:
