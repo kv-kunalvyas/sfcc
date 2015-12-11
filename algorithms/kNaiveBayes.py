@@ -2,17 +2,18 @@ __author__ = 'kunal'
 import csv
 from sklearn.naive_bayes import GaussianNB
 import auxiliary
+from sklearn import metrics
 
 trainDf = auxiliary.initialise_train(False)
 # auxiliary.computeMean(Category)
 
 # select all columns except
-trainDf = trainDf.drop(['Dates', 'Descript', 'Resolution', 'Address', 'X', 'Y'], axis=1)
+trainDf = trainDf.drop(['Dates', 'Descript', 'DayOfWeek', 'Resolution', 'Address'], axis=1)
 
 # Test data
 testDf = auxiliary.initialise_test(False)
 ids = testDf['Id'].values
-testDf = testDf.drop(['Id', 'Dates', 'Address', 'X', 'Y'], axis=1)
+testDf = testDf.drop(['Id', 'Dates', 'DayOfWeek', 'Address'], axis=1)
 
 # Attributes used in the model
 print list(trainDf.columns.values)

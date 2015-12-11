@@ -5,16 +5,16 @@ from sklearn.linear_model import LogisticRegression as lr
 import auxiliary
 
 trainDf = auxiliary.initialise_train(False)
-# auxiliary.computeMean(Category)
+
 # select all columns except
 # Dates,Category,Descript,DayOfWeek,PdDistrict,Resolution,Address,X,Y,Year,Week,Hour
-trainDf = trainDf.drop(['Dates', 'Descript', 'Resolution', 'Address', 'X', 'Y'], axis=1)
+trainDf = trainDf.drop(['Dates', 'Descript', 'DayOfWeek', 'Resolution', 'Address'], axis=1)
 
 # Test data
 testDf = auxiliary.initialise_test(False)
 ids = testDf['Id'].values
 # Id,Dates,DayOfWeek,PdDistrict,Address,X,Y,Year,Week,Hour
-testDf = testDf.drop(['Id', 'Dates', 'Address', 'X', 'Y'], axis=1)
+testDf = testDf.drop(['Id', 'Dates', 'Address', 'DayOfWeek'], axis=1)
 
 # Random Forest Algorithm
 print list(trainDf.columns.values)
