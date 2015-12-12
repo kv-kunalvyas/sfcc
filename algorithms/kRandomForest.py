@@ -36,6 +36,7 @@ print 'P Values: ', f_classif(trainData[0::,1::], trainData[0::,0])[1]
 '''
 print 'Training...'
 # Deciding best parameters for Random Forest
+'''
 n_estimators = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
 best_cv_score = -9999.9999
 best_n_est = 10000
@@ -49,8 +50,8 @@ for i in n_estimators:
         best_n_est = i
 plt.plot(n_estimators, avg_scores)
 plt.show()
-
-forest_v = rfc(n_estimators=best_n_est, oob_score=True)
+'''
+forest_v = rfc(n_estimators=500, oob_score=True)
 forest = forest_v.fit(trainData[0::,1::], trainData[0::,0])
 forest_val = forest_v.fit(X[0::,1::], X[0::,0])
 
