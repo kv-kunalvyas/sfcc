@@ -1,5 +1,5 @@
 # sfcc
-San Francisco Crime Classification
+Kaggle problem - San Francisco Crime Classification
 
 Requirements:
 -----
