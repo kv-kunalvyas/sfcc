@@ -22,7 +22,6 @@ X, y = train_test_split(trainDf, train_size=.75)
 testDf = auxiliary.initialise_test(False)
 ids = testDf['Id'].values
 testDf = testDf.drop(['Id', 'Dates', 'Address', 'DayOfWeek'], axis=1)
-actual = y[0::,0].tolist()
 
 # back to numpy format
 trainData = trainDf.values
@@ -51,7 +50,7 @@ for i in n_estimators:
 plt.plot(n_estimators, avg_scores)
 plt.show()
 '''
-forest_v = rfc(n_estimators=500, oob_score=True)
+forest_v = rfc(n_estimators=500, oob_score=True, )
 forest = forest_v.fit(trainData[0::,1::], trainData[0::,0])
 forest_val = forest_v.fit(X[0::,1::], X[0::,0])
 
@@ -62,8 +61,6 @@ print "Feature Importances: ", importances
 print 'Predicting...'
 output = forest.predict_proba(testData).astype(float)
 predicted = forest_val.predict_proba(y[0::,1::]).astype(float)
-
-print "Multi Class Log Loss on Validation set: ", metrics.log_loss(actual, predicted)
 
 output = output.tolist()
 predictions_file = open("../submissionRF.csv", "wb")

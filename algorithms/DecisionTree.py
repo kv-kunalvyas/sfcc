@@ -22,7 +22,7 @@ X, y = train_test_split(trainDf, train_size=.75)
 testDf = auxiliary.initialise_test(True)
 ids = testDf['Id'].values
 testDf = testDf.drop(['Id', 'Dates','PdDistrict', 'X', 'Y', 'Address'], axis=1)
-actual = y[0::,0].tolist()
+
 # Attributes used in the model
 print list(trainDf.columns.values)
 print list(testDf.columns.values)
@@ -56,9 +56,6 @@ print "Importances: ", importances
 print 'Predicting...'
 output = dtree.predict_proba(testData).astype(float)
 predicted = dtree_val.predict_proba(y[0::,1::]).astype(float)
-
-print "Calculating Multi Class Log Loss..."
-print "Multi Class Log Loss on Validation set: ", metrics.log_loss(actual, predicted)
 
 output = output.tolist()
 predictions_file = open("../submissionDT.csv", "wb")
