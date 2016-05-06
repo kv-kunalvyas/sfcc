@@ -120,3 +120,13 @@ def plotLearningCurves(train, classifier):
     classifier.fit(X_train, y_train)
     plt.show()
 
+
+def k_fold_generator(X, y, k_fold):
+    subset_size = len(X) / k_fold
+    for k in range(k_fold):
+        X_train = X[:k * subset_size] + X[(k + 1) * subset_size:]
+        X_valid = X[k * subset_size:][:subset_size]
+        y_train = y[:k * subset_size] + y[(k + 1) * subset_size:]
+        y_valid = y[k * subset_size:][:subset_size]
+
+        yield X_train, y_train, X_valid, y_valid
