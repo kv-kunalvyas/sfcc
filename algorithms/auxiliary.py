@@ -2,15 +2,19 @@ __author__ = 'kunal'
 
 import numpy as np
 import pandas as pd
+from sklearn import preprocessing as pp
+from sklearn.feature_extraction.text import CountVectorizer
 
 #import pylab as P
 import matplotlib.pyplot as plt
 from sklearn.learning_curve import learning_curve
 from sklearn.cross_validation import train_test_split
 
+
 def initialise():
     data_frame = pd.read_csv('../data/train.csv', header=0)
     return data_frame
+
 
 def initialise_train(dates):
     if not dates:
@@ -18,6 +22,7 @@ def initialise_train(dates):
     elif dates:
         data_frame = pd.read_csv('../data/train.csv', header=0, parse_dates=['Dates'])
         data_frame['Year'] = data_frame['Dates'].map(lambda x: x.year)
+        data_frame['Month'] = data_frame['Dates'].map(lambda x: x.month)
         data_frame['Week'] = data_frame['Dates'].map(lambda x: x.week)
         data_frame['Hour'] = data_frame['Dates'].map(lambda x: x.hour)
 
@@ -40,11 +45,31 @@ def initialise_train(dates):
     data_frame.DayOfWeek = data_frame.DayOfWeek.map(lambda x: DaysOfWeeksDict[x]).astype(int)
     data_frame.PdDistrict = data_frame.PdDistrict.map(lambda x: PdDistrictsDict[x]).astype(int)
     data_frame.Resolution = data_frame.Resolution.map(lambda x: ResolutionsDict[x]).astype(int)
+
+    xy_scaler = pp.StandardScaler()
+    xy_scaler.fit(data_frame[["X", "Y"]])
+    data_frame[["X", "Y"]] = xy_scaler.transform(data_frame[["X", "Y"]])
+    data_frame["rot45_X"] = .707 * data_frame["Y"] + .707 * data_frame["X"]
+    data_frame["rot45_Y"] = .707 * data_frame["Y"] - .707 * data_frame["X"]
+    data_frame["rot30_X"] = (1.732 / 2) * data_frame["X"] + (1. / 2) * data_frame["Y"]
+    data_frame["rot30_Y"] = (1.732 / 2) * data_frame["Y"] - (1. / 2) * data_frame["X"]
+    data_frame["rot60_X"] = (1. / 2) * data_frame["X"] + (1.732 / 2) * data_frame["Y"]
+    data_frame["rot60_Y"] = (1. / 2) * data_frame["Y"] - (1.732 / 2) * data_frame["X"]
+    data_frame["radial_r"] = np.sqrt(np.power(data_frame["Y"], 2) + np.power(data_frame["X"], 2))
+
     # rounding off location coordinates to 2 decimal points
     data_frame.X = data_frame.X.map(lambda x: "%.2f" % round(x, 2)).astype(float)
     data_frame.Y = data_frame.Y.map(lambda x: "%.2f" % round(x, 2)).astype(float)
+    data_frame.rot45_X = data_frame.rot45_X.map(lambda x: "%.2f" % round(x, 2)).astype(float)
+    data_frame.rot45_Y = data_frame.rot45_Y.map(lambda x: "%.2f" % round(x, 2)).astype(float)
+    data_frame.rot30_X = data_frame.rot30_X.map(lambda x: "%.2f" % round(x, 2)).astype(float)
+    data_frame.rot30_Y = data_frame.rot30_Y.map(lambda x: "%.2f" % round(x, 2)).astype(float)
+    data_frame.rot60_X = data_frame.rot60_X.map(lambda x: "%.2f" % round(x, 2)).astype(float)
+    data_frame.rot60_Y = data_frame.rot60_Y.map(lambda x: "%.2f" % round(x, 2)).astype(float)
+    data_frame.radial_r = data_frame.radial_r.map(lambda x: "%.2f" % round(x, 2)).astype(float)
 
     return data_frame
+
 
 def initialise_test(dates):
     if not dates:
@@ -52,6 +77,7 @@ def initialise_test(dates):
     elif dates:
         data_frame = pd.read_csv('../data/test.csv', header=0, parse_dates=['Dates'])
         data_frame['Year'] = data_frame['Dates'].map(lambda x: x.year)
+        data_frame['Month'] = data_frame['Dates'].map(lambda x: x.month)
         data_frame['Week'] = data_frame['Dates'].map(lambda x: x.week)
         data_frame['Hour'] = data_frame['Dates'].map(lambda x: x.hour)
 
@@ -62,9 +88,29 @@ def initialise_test(dates):
     DaysOfWeeksDict = {name: i for i, name in DaysOfWeeks}
     data_frame.PdDistrict = data_frame.PdDistrict.map(lambda x: PdDistrictsDict[x]).astype(int)
     data_frame.DayOfWeek = data_frame.DayOfWeek.map(lambda x: DaysOfWeeksDict[x]).astype(int)
+
+    xy_scaler = pp.StandardScaler()
+    xy_scaler.fit(data_frame[["X", "Y"]])
+    data_frame[["X", "Y"]] = xy_scaler.transform(data_frame[["X", "Y"]])
+    data_frame["rot45_X"] = .707 * data_frame["Y"] + .707 * data_frame["X"]
+    data_frame["rot45_Y"] = .707 * data_frame["Y"] - .707 * data_frame["X"]
+    data_frame["rot30_X"] = (1.732 / 2) * data_frame["X"] + (1. / 2) * data_frame["Y"]
+    data_frame["rot30_Y"] = (1.732 / 2) * data_frame["Y"] - (1. / 2) * data_frame["X"]
+    data_frame["rot60_X"] = (1. / 2) * data_frame["X"] + (1.732 / 2) * data_frame["Y"]
+    data_frame["rot60_Y"] = (1. / 2) * data_frame["Y"] - (1.732 / 2) * data_frame["X"]
+    data_frame["radial_r"] = np.sqrt(np.power(data_frame["Y"], 2) + np.power(data_frame["X"], 2))
+
     # rounding off location coordinates to 2 decimal points
     data_frame.X = data_frame.X.map(lambda x: "%.2f" % round(x, 2)).astype(float)
     data_frame.Y = data_frame.Y.map(lambda x: "%.2f" % round(x, 2)).astype(float)
+    data_frame.rot45_X = data_frame.rot45_X.map(lambda x: "%.2f" % round(x, 2)).astype(float)
+    data_frame.rot45_Y = data_frame.rot45_Y.map(lambda x: "%.2f" % round(x, 2)).astype(float)
+    data_frame.rot30_X = data_frame.rot30_X.map(lambda x: "%.2f" % round(x, 2)).astype(float)
+    data_frame.rot30_Y = data_frame.rot30_Y.map(lambda x: "%.2f" % round(x, 2)).astype(float)
+    data_frame.rot60_X = data_frame.rot60_X.map(lambda x: "%.2f" % round(x, 2)).astype(float)
+    data_frame.rot60_Y = data_frame.rot60_Y.map(lambda x: "%.2f" % round(x, 2)).astype(float)
+    data_frame.radial_r = data_frame.radial_r.map(lambda x: "%.2f" % round(x, 2)).astype(float)
+
     return data_frame
 
 
